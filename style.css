@@ -1,0 +1,37 @@
+body{margin:0;font-family:Poppins;background:#eef2f7}
+
+header{
+  background:#0b3d91;
+  color:white;
+  padding:15px 40px;
+  display:flex;
+  justify-content:space-between;
+}
+
+header h1{color:#ff9800}
+nav a{color:white;margin:0 10px;text-decoration:none}
+
+.container{width:90%;margin:auto}
+.card{
+  background:white;
+  padding:20px;
+  margin:20px 0;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.btn{
+  padding:10px 20px;
+  background:#ff9800;
+  color:white;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+.hero{
+  background:#0b3d91;
+  color:white;
+  text-align:center;
+  padding:80px 20px;
+}

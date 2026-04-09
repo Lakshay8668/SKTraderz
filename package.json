@@ -1,0 +1,16 @@
+{
+  "name": "sktraderz",
+  "version": "1.0.0",
+  "description": "Logistic website with courier tracking",
+  "main": "Server.js",
+  "scripts": {
+    "start": "node Server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "node-fetch": "^3.3.2"
+  }
+}</content>
+<parameter name="filePath">c:\Users\Lakshay Soni\Desktop\SKTraderz\package.json

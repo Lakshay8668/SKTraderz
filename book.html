@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+<script src="script.js"></script>
+</head>
+<body>
+
+<header>...same navbar...</header>
+
+<div class="container">
+<div class="card">
+<h2>Book Delivery</h2>
+
+<input id="sender" placeholder="Sender Name">
+<input id="pickup" placeholder="Pickup Address">
+<input id="receiver" placeholder="Receiver Name">
+<input id="delivery" placeholder="Delivery Address">
+
+<button class="btn" onclick="bookOrder()">Confirm</button>
+<p id="msg"></p>
+
+</div>
+</div>
+
+</body>
+</html>
