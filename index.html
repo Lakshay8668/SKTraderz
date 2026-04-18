@@ -38,7 +38,7 @@ header{
   top:0;
   z-index:100;
 }
-header h1{color:#ff9800;margin:0}
+header img{color:#ff9800;margin:0}
 
 nav a{
   color:#fff;
@@ -845,7 +845,7 @@ img {
 <body>
 
 <header>
-<h1>SKTraderz</h1>
+<img src="SKTraderz_logo.svg" alt="SKTraderz" style="height: 50px;">
 <nav>
 <a href="#home">Home</a>
 <a href="#services">Services</a>
@@ -895,7 +895,7 @@ img {
 </div>
 </div>
 <div class="about-image">
-<img src="https://via.placeholder.com/400x300/0b3d91/ffffff?text=SKTraderz+Logistics" alt="SKTraderz Logistics" style="width:100%; border-radius:10px;">
+<img src="SKTraderz_logo.svg" alt="SKTraderz Logistics" style="max-width:320px; width:auto; border-radius:10px;">
 </div>
 </div>
 </section>
@@ -1182,270 +1182,169 @@ Import-Export Business
 
 <script>
 try {
-  const firebaseConfig={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",databaseURL:"https://YOUR_PROJECT.firebaseio.com",projectId:"YOUR_PROJECT"};
+  const firebaseConfig={
+    apiKey:"YOUR_API_KEY",
+    authDomain:"YOUR_PROJECT.firebaseapp.com",
+    databaseURL:"https://YOUR_PROJECT.firebaseio.com",
+    projectId:"YOUR_PROJECT"
+  };
   firebase.initializeApp(firebaseConfig);
   const db=firebase.database();
-  console.log('✅ Firebase initialized');
-} catch (e) {
-  console.log('⚠️ Firebase not available, using localStorage only');
-}
+} catch (e) {}
 
 let currentUser="";
 
-// Load saved user on page load
+// ✅ AUTO LOGIN (MAIN FIX)
 window.addEventListener('load', function() {
   const savedUser = localStorage.getItem('currentUser');
   const savedPickup = localStorage.getItem('userPickup');
+
   if (savedUser) {
     currentUser = savedUser;
+
     document.getElementById("userName").value = savedUser;
     document.getElementById("userPickup").value = savedPickup || '';
-    document.getElementById("loginMsg").innerHTML = "Logged in as " + savedUser;
+
+    document.getElementById("sender").value = savedUser;
+    document.getElementById("pickup").value = savedPickup || '';
+
+    document.getElementById("loginMsg").innerHTML = "✅ Welcome back, " + savedUser;
     document.getElementById("dashboard").style.display = "block";
     document.getElementById("logoutBtn").style.display = "inline-block";
+
     loadMyOrders();
   }
 });
 
+// ✅ LOGIN
 function loginUser(){
-let name=document.getElementById("userName").value.trim();
-let pickup=document.getElementById("userPickup").value.trim();
-if(!name){
-  toast("Enter name");
-  return;
-}
-currentUser=name;
-localStorage.setItem('currentUser', name);
-localStorage.setItem('userPickup', pickup);
-document.getElementById("loginMsg").innerHTML="Logged in as "+name;
-document.getElementById("dashboard").style.display="block";
-document.getElementById("logoutBtn").style.display="inline-block";
-loadMyOrders();
-}
+  let name=document.getElementById("userName").value.trim();
+  let pickup=document.getElementById("userPickup").value.trim();
 
-function logoutUser(){
-if(confirm("Are you sure you want to logout?")){
-  currentUser="";
-  localStorage.removeItem('currentUser');
-  localStorage.removeItem('userPickup');
-  document.getElementById("userName").value = "";
-  document.getElementById("userPickup").value = "";
-  document.getElementById("loginMsg").innerHTML = "";
-  document.getElementById("dashboard").style.display = "none";
-  document.getElementById("logoutBtn").style.display = "none";
-  document.getElementById("myOrders").innerHTML = "";
-  toast("Logged out");
-}
-}
-
-function loadMyOrders(){
-  let html = '';
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith('orders/')) {
-      const data = JSON.parse(localStorage.getItem(key));
-      if (data.sender === currentUser) {
-        html += `<div class="order">${key.replace('orders/', '')}<br>${data.status}</div>`;
-      }
-    }
-  }
-  document.getElementById("myOrders").innerHTML = html || "No orders";
-}
-
-function generateId(){return 'SK'+Math.floor(Math.random()*100000)}
-
-function bookOrder(){
-let id=generateId();
-let senderName=document.getElementById("sender").value || currentUser;
-let pickupAddr=document.getElementById("pickup").value || localStorage.getItem('userPickup') || '';
-let receiverName=document.getElementById("receiver").value;
-let deliveryAddr=document.getElementById("delivery").value;
-
-// Validation
-if (!senderName || !pickupAddr || !receiverName || !deliveryAddr) {
-  document.getElementById("msg").innerHTML = "❌ All fields are required";
-  return;
-}
-
-// Show loading
-const btn = document.querySelector('#book .btn');
-const originalText = btn.textContent;
-btn.innerHTML = '<span class="loading"></span>Processing...';
-btn.disabled = true;
-
-setTimeout(() => {
-  const orderData = {
-    sender: senderName,
-    pickup: pickupAddr,
-    receiver: receiverName,
-    delivery: deliveryAddr,
-    status: 'Picked Up',
-    bookingTime: new Date().toISOString(),
-    id: id
-  };
-
-  localStorage.setItem('orders/'+id, JSON.stringify(orderData));
-  document.getElementById("msg").innerHTML='✅ Booking successful! Your tracking ID is: <strong>' + id + '</strong>';
-  document.getElementById("msg").style.color = 'green';
-  
-  // Clear form
-  document.getElementById("sender").value = '';
-  document.getElementById("pickup").value = '';
-  document.getElementById("receiver").value = '';
-  document.getElementById("delivery").value = '';
-  
-  // Reset button
-  btn.innerHTML = originalText;
-  btn.disabled = false;
-  
-  toast('Booking confirmed!');
-  loadMyOrders();
-}, 1500);
-}
-
-function trackOrder(){
-  const trackId = document.getElementById('trackId').value.trim();
-  if (!trackId) {
-    toast('Enter tracking ID');
+  if(!name){
+    toast("Enter name");
     return;
   }
 
-  const orderData = localStorage.getItem('orders/' + trackId);
-  if (orderData) {
-    const data = JSON.parse(orderData);
-    document.getElementById('trackingUI').style.display = 'block';
-    document.getElementById('statusText').innerHTML = 'Status: ' + data.status;
-    let p = data.status === 'Picked Up' ? 33 : data.status === 'In Transit' ? 66 : 100;
-    document.getElementById('progressBar').style.width = p + '%';
-  } else {
-    toast('Not found');
+  currentUser=name;
+
+  localStorage.setItem('currentUser', name);
+  localStorage.setItem('userPickup', pickup);
+
+  // Auto fill booking form
+  document.getElementById("sender").value = name;
+  document.getElementById("pickup").value = pickup;
+
+  document.getElementById("loginMsg").innerHTML="✅ Logged in as "+name;
+  document.getElementById("dashboard").style.display="block";
+  document.getElementById("logoutBtn").style.display="inline-block";
+
+  loadMyOrders();
+}
+
+// ✅ LOGOUT
+function logoutUser(){
+  if(confirm("Logout?")){
+    currentUser="";
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userPickup');
+
+    document.getElementById("userName").value="";
+    document.getElementById("userPickup").value="";
+    document.getElementById("sender").value="";
+    document.getElementById("pickup").value="";
+
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("logoutBtn").style.display="none";
+    document.getElementById("myOrders").innerHTML="";
+
+    toast("Logged out");
   }
 }
 
-function loadOrders(){
-let html = '';
-for (let i = 0; i < localStorage.length; i++) {
-  const key = localStorage.key(i);
-  if (key.startsWith('orders/')) {
-    const id = key.replace('orders/', '');
-    const data = JSON.parse(localStorage.getItem(key));
-    html += `<div>
-      <b>${id}</b><br>
-      ${data.sender} → ${data.receiver}<br>
-      <select onchange="updateStatus('${id}',this.value)">
-        <option ${data.status === 'Picked Up' ? 'selected' : ''}>Picked Up</option>
-        <option ${data.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
-        <option ${data.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-      </select>
-    </div><hr>`;
-  }
-}
-document.getElementById('orders').innerHTML = html;
-}
+// ✅ LOAD USER ORDERS
+function loadMyOrders(){
+  let html='';
 
-function updateStatus(id,status){
-  const existingDataStr = localStorage.getItem('orders/'+id);
-  if (existingDataStr) {
-    const existingData = JSON.parse(existingDataStr);
-    existingData.status = status;
-    localStorage.setItem('orders/'+id, JSON.stringify(existingData));
-    toast('Updated');
-  }
-}
-
-function searchOrders(){
-  const searchTerm = document.getElementById('orderSearch').value.toLowerCase().trim();
-  let html = '';
-  
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
+
     if (key.startsWith('orders/')) {
-      const id = key.replace('orders/', '');
       const data = JSON.parse(localStorage.getItem(key));
-      
-      // Search in ID, sender, receiver, pickup, delivery
-      if (!searchTerm || 
-          id.toLowerCase().includes(searchTerm) ||
-          data.sender.toLowerCase().includes(searchTerm) ||
-          data.receiver.toLowerCase().includes(searchTerm) ||
-          data.pickup.toLowerCase().includes(searchTerm) ||
-          data.delivery.toLowerCase().includes(searchTerm)) {
-        
-        html += `<div>
-          <b>${id}</b><br>
-          <strong>Sender:</strong> ${data.sender}<br>
-          <strong>Receiver:</strong> ${data.receiver}<br>
-          <strong>Pickup:</strong> ${data.pickup}<br>
-          <strong>Delivery:</strong> ${data.delivery}<br>
-          <strong>Status:</strong> 
-          <select onchange="updateStatus('${id}',this.value)">
-            <option ${data.status === 'Picked Up' ? 'selected' : ''}>Picked Up</option>
-            <option ${data.status === 'In Transit' ? 'selected' : ''}>In Transit</option>
-            <option ${data.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-          </select>
+
+      if (data.sender === currentUser) {
+        html += `<div class="order">
+          <b>${data.id}</b><br>
+          Status: ${data.status}
         </div><hr>`;
       }
     }
   }
-  
-  document.getElementById('orders').innerHTML = html || 'No orders found matching your search.';
+
+  document.getElementById("myOrders").innerHTML = html || "No orders found";
 }
 
-function exportOrders(){
-  let csv = 'Order ID,Sender,Receiver,Pickup Address,Delivery Address,Status\n';
-  
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith('orders/')) {
-      const id = key.replace('orders/', '');
-      const data = JSON.parse(localStorage.getItem(key));
-      csv += `"${id}","${data.sender}","${data.receiver}","${data.pickup}","${data.delivery}","${data.status}"\n`;
-    }
-  }
-  
-  // Create and download CSV file
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `sktraderz_orders_${new Date().toISOString().split('T')[0]}.csv`;
-  a.click();
-  window.URL.revokeObjectURL(url);
-  
-  toast('Orders exported to CSV!');
+// ✅ BOOK ORDER
+function generateId(){
+  return 'SK'+Math.floor(Math.random()*100000);
 }
 
-function toggleFAQ(element){
-  const faqItem = element.parentElement;
-  faqItem.classList.toggle('active');
-}
+function bookOrder(){
+  let id=generateId();
 
-function subscribeNewsletter(){
-  const email = document.getElementById('newsletterEmail').value.trim();
-  const msgDisplay = document.getElementById('newsletterMsg');
+  let senderName=document.getElementById("sender").value || currentUser;
+  let pickupAddr=document.getElementById("pickup").value || localStorage.getItem('userPickup');
+  let receiverName=document.getElementById("receiver").value;
+  let deliveryAddr=document.getElementById("delivery").value;
 
-  if (!email) {
-    msgDisplay.innerHTML = '❌ Please enter your email';
-    msgDisplay.style.color = 'red';
+  if (!senderName || !pickupAddr || !receiverName || !deliveryAddr) {
+    document.getElementById("msg").innerHTML="❌ Fill all fields";
     return;
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    msgDisplay.innerHTML = '❌ Please enter a valid email';
-    msgDisplay.style.color = 'red';
+  const orderData={
+    id,
+    sender: senderName,
+    pickup: pickupAddr,
+    receiver: receiverName,
+    delivery: deliveryAddr,
+    status:'Picked Up'
+  };
+
+  localStorage.setItem('orders/'+id, JSON.stringify(orderData));
+
+  document.getElementById("msg").innerHTML=
+    `✅ Booking Done! ID: <b>${id}</b>`;
+
+  toast("Order booked");
+
+  loadMyOrders();
+}
+
+// ✅ TRACK ORDER
+function trackOrder(){
+  let id=document.getElementById("trackId").value.trim();
+
+  let data=localStorage.getItem('orders/'+id);
+
+  if(!data){
+    toast("Not found");
     return;
   }
 
-  // In a real application, this would send to a server
-  msgDisplay.innerHTML = '✅ Thank you for subscribing!';
-  msgDisplay.style.color = 'green';
+  data=JSON.parse(data);
 
-  // Clear form
-  document.getElementById('newsletterEmail').value = '';
+  document.getElementById('trackingUI').style.display='block';
+  document.getElementById('statusText').innerHTML='Status: '+data.status;
 
-  toast('Newsletter subscribed!');
+  let p = data.status==='Picked Up'?33:
+          data.status==='In Transit'?66:100;
+
+  document.getElementById('progressBar').style.width=p+'%';
 }
+
+// ✅ FIXED CONTACT FORM (IMPORTANT FIX)
+function sendMessage(){
   const name = document.getElementById('contactName').value.trim();
   const email = document.getElementById('contactEmail').value.trim();
   const subject = document.getElementById('contactSubject').value.trim();
@@ -1453,67 +1352,37 @@ function subscribeNewsletter(){
   const msgDisplay = document.getElementById('contactMsg');
 
   if (!name || !email || !subject || !message) {
-    msgDisplay.innerHTML = '❌ Please fill all fields';
+    msgDisplay.innerHTML = '❌ Fill all fields';
     msgDisplay.style.color = 'red';
     return;
   }
 
-  // Email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    msgDisplay.innerHTML = '❌ Please enter a valid email';
-    msgDisplay.style.color = 'red';
-    return;
-  }
-
-  // In a real application, this would send to a server
-  // For now, we'll simulate sending
-  msgDisplay.innerHTML = '✅ Message sent successfully! We\'ll get back to you soon.';
+  msgDisplay.innerHTML = '✅ Message sent!';
   msgDisplay.style.color = 'green';
 
-  // Clear form
-  document.getElementById('contactName').value = '';
-  document.getElementById('contactEmail').value = '';
-  document.getElementById('contactSubject').value = '';
-  document.getElementById('contactMessage').value = '';
+  document.getElementById('contactName').value='';
+  document.getElementById('contactEmail').value='';
+  document.getElementById('contactSubject').value='';
+  document.getElementById('contactMessage').value='';
 
-  toast('Message sent!');
+  toast('Message sent');
+}
 
+// ✅ PRICE
 function calcPrice(){
-let kmVal=+document.getElementById("km").value||0;
-let wtVal=+document.getElementById("wt").value||0;
-price.innerText='₹'+(30+(kmVal*5)+(wtVal*10));
+  let km=+document.getElementById("km").value||0;
+  let wt=+document.getElementById("wt").value||0;
+
+  document.getElementById("price").innerText='₹'+(30+(km*5)+(wt*10));
 }
 
+// ✅ TOAST
 function toast(msg){
-let t=document.getElementById('toast');
-t.innerText=msg;t.classList.add('show');
-setTimeout(()=>t.classList.remove('show'),2000);
+  let t=document.getElementById('toast');
+  t.innerText=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
-
-/* SMOOTH ANIMATION */
-const observer=new IntersectionObserver(entries=>{
-entries.forEach(entry=>{
-if(entry.isIntersecting){
-entry.target.classList.add('show');
-}
-});
-});
-
-document.querySelectorAll('.card,.feature').forEach(el=>{
-el.classList.add('hidden');
-observer.observe(el);
-});
-
-// Back to top button
-window.addEventListener('scroll', function() {
-  const backToTop = document.getElementById('backToTop');
-  if (window.pageYOffset > 300) {
-    backToTop.style.display = 'block';
-  } else {
-    backToTop.style.display = 'none';
-  }
-});
 </script>
 
 </body>
