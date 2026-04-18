@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKTraderz Logistics</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+<script src="script.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body{
+  margin:0;
+  font-family:Poppins, sans-serif;
+  background:linear-gradient(120deg,#eef2f7,#dfe9ff);
+  color:#1b2b4b;
+}
+
+/* HEADER */
+header{
+  background:rgba(11,61,145,.8);
+  backdrop-filter:blur(15px);
+  padding:15px 30px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+header img{color:#ff9800;margin:0}
+
+nav a{
+  color:#fff;
+  margin:0 12px;
+  text-decoration:none;
+  position:relative;
+}
+nav a::after{
+  content:"";
+  position:absolute;
+  width:0;
+  height:2px;
+  background:#ff9800;
+  bottom:-4px;
+  left:0;
+  transition:.3s;
+}
+nav a:hover::after{width:100%}
+
+/* HERO */
+.hero{
+  background:linear-gradient(135deg,#0b3d91,#1e5ed8);
+  color:#fff;
+  padding:100px 20px;
+  text-align:center;
+  animation:fadeIn 1s ease;
+  margin-bottom:60px;
+  position:relative;
+}
+.hero h2{
+  font-size:42px;
+  animation:slideUp .8s ease;
+  margin-bottom:20px;
+}
+
+/* BUTTON */
+.btn{
+  padding:12px 26px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  font-weight:600;
+  background:linear-gradient(45deg,#ff9800,#ffb347);
+  color:white;
+  transition:.3s;
+  position:relative;
+  overflow:hidden;
+}
+.btn:hover{transform:scale(1.07)}
+
+/* ripple */
+.btn::after{
+  content:"";
+  position:absolute;
+  width:0;
+  height:0;
+  background:rgba(255,255,255,.4);
+  border-radius:50%;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  transition:.5s;
+}
+.btn.secondary{
+  background:linear-gradient(45deg,#666,#999);
+  margin-left:10px;
+}
+
+/* CARDS */
+.card{
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(12px);
+  padding:25px;
+  margin:25px auto;
+  border-radius:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,.1);
+  transition:.4s;
+  position:relative;
+  z-index:1;
+  max-width: 100%;
+}
+.card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 25px 50px rgba(0,0,0,.15);
+}
+
+.container{
+  width:90%;
+  max-width:1200px;
+  margin:0 auto;
+  padding:20px;
+  box-sizing:border-box;
+}
+
+input,textarea,select{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:10px;
+  border:1px solid #ddd;
+  transition:.2s;
+}
+input:focus{
+  border-color:#0b3d91;
+  box-shadow:0 0 10px rgba(11,61,145,.2);
+  outline:none;
+}
+
+/* FEATURES */
+.features{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  margin: 0 0 60px 0;
+  position:relative;
+  z-index:10;
+}
+.feature{
+  background:white;
+  padding:25px;
+  border-radius:18px;
+  text-align:center;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  transition:.3s;
+}
+.feature:hover{transform:translateY(-5px) scale(1.02)}
+
+/* TRACK */
+.progress{
+  height:10px;
+  background:#ddd;
+  border-radius:10px;
+  overflow:hidden;
+}
+.progress-bar{
+  height:100%;
+  background:linear-gradient(90deg,#ff9800,#ffd699);
+  width:0%;
+  transition:.6s;
+}
+
+/* WHATSAPP */
+.whatsapp{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#25D366;
+  padding:18px;
+  border-radius:50%;
+  color:white;
+  animation:float 2s infinite;
+}
+
+/* ANIMATION */
+.hidden{
+  opacity:0;
+  transform:translateY(40px);
+  transition:all .6s ease;
+}
+.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.toast{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:#1b2b4b;
+  color:#fff;
+  padding:12px;
+  border-radius:10px;
+  opacity:0;
+  transition:.3s;
+}
+.toast.show{opacity:1}
+
+.footer{
+  background:#001f4d;
+  color:#fff;
+  padding:40px 0 20px 0;
+}
+.footer-content{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:30px;
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 20px;
+}
+.footer-section h3{
+  color:#ff9800;
+  margin-bottom:15px;
+}
+.footer-section p{
+  color:#ccc;
+  line-height:1.6;
+}
+.footer-section ul{
+  list-style:none;
+  padding:0;
+}
+.footer-section li{
+  margin:8px 0;
+}
+.footer-section a{
+  color:#ccc;
+  text-decoration:none;
+  transition:.3s;
+}
+.footer-section a:hover{
+  color:#ff9800;
+}
+.social-links{
+  display:flex;
+  gap:15px;
+  margin-top:15px;
+}
+.social-link{
+  color:#fff;
+  text-decoration:none;
+  padding:8px 12px;
+  border-radius:5px;
+  background:#333;
+  transition:.3s;
+}
+.social-link:hover{
+  background:#ff9800;
+}
+.newsletter{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+.footer-bottom{
+  text-align:center;
+  padding-top:20px;
+  margin-top:30px;
+  border-top:1px solid #333;
+  color:#ccc;
+}
+.footer-bottom a{
+  color:#ff9800;
+  text-decoration:none;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  nav {
+    margin-top: 10px;
+  }
+  
+  nav a {
+    margin: 0 8px;
+    font-size: 14px;
+  }
+  
+  .hero {
+    padding: 80px 20px;
+  }
+  
+  .hero h2 {
+    font-size: 28px;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+    margin-top: -20px;
+  }
+  
+  .about-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .contact-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .contact-info {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .stats {
+    justify-content: center;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+}
+
+/* ADMIN CONTROLS */
+.admin-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-controls .btn {
+  white-space: nowrap;
+}
+
+.admin-controls input {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* GENERAL SECTION SPACING */
+section {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+section h2 {
+  margin-bottom: 40px;
+  font-weight: 600;
+}
+
+/* Ensure proper content flow */
+body {
+  line-height: 1.6;
+}
+
+.container > * {
+  margin-bottom: 20px;
+}
+
+.container > *:last-child {
+  margin-bottom: 0;
+}
+
+/* SERVICES SECTION */
+.services-section{
+  padding:60px 0;
+  background:#f8f9fa;
+  text-align:center;
+  margin-bottom: 60px;
+}
+.services-section h2{
+  color:#1b2b4b;
+  font-size:36px;
+  margin-bottom:40px;
+}
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:30px;
+  max-width:1200px;
+  margin:0 auto;
+}
+.service-card{
+  background:white;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  transition:.3s;
+}
+.service-card:hover{
+  transform:translateY(-10px);
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+.service-card h3{
+  color:#ff9800;
+  margin-bottom:15px;
+}
+.service-card ul{
+  text-align:left;
+  padding-left:20px;
+}
+.service-card li{
+  margin:8px 0;
+  color:#666;
+}
+
+/* ABOUT SECTION */
+.about-section{
+  padding:60px 0;
+  background:white;
+  margin-bottom: 60px;
+}
+.about-content{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:50px;
+  max-width:1200px;
+  margin:0 auto;
+  align-items:center;
+}
+.about-text h2{
+  color:#1b2b4b;
+  font-size:36px;
+  margin-bottom:20px;
+}
+.about-text p{
+  color:#666;
+  line-height:1.6;
+  margin-bottom:20px;
+}
+.stats{
+  display:flex;
+  gap:30px;
+  margin-top:30px;
+}
+.stat h3{
+  color:#ff9800;
+  font-size:32px;
+  margin:0;
+}
+.stat p{
+  color:#666;
+  margin:5px 0 0 0;
+}
+
+/* TESTIMONIALS */
+.testimonials-section{
+  padding:60px 0;
+  background:#f8f9fa;
+  text-align:center;
+  margin-bottom: 60px;
+}
+.testimonials-section h2{
+  color:#1b2b4b;
+  font-size:36px;
+  margin-bottom:40px;
+}
+.testimonials-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:30px;
+  max-width:1200px;
+  margin:0 auto;
+}
+.testimonial{
+  background:white;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+.testimonial-content{
+  font-style:italic;
+  color:#666;
+  margin-bottom:20px;
+}
+.testimonial-author{
+  color:#1b2b4b;
+  font-weight:600;
+}
+
+/* CONTACT SECTION */
+.contact-section{
+  padding:60px 0;
+  background:white;
+  margin-bottom: 60px;
+}
+.contact-section h2{
+  text-align:center;
+  color:#1b2b4b;
+  font-size:36px;
+  margin-bottom:40px;
+}
+.contact-content{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:50px;
+  max-width:1200px;
+  margin:0 auto;
+}
+.contact-info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
+}
+.contact-item h3{
+  color:#ff9800;
+  margin-bottom:10px;
+}
+.contact-item p{
+  color:#666;
+  line-height:1.5;
+}
+.contact-form h3{
+  color:#1b2b4b;
+  margin-bottom:20px;
+}
+/* FAQ SECTION */
+.faq-section{
+  padding:60px 0;
+  background:white;
+  text-align:center;
+  margin-bottom: 60px;
+}
+.faq-section h2{
+  color:#1b2b4b;
+  font-size:36px;
+  margin-bottom:40px;
+}
+.faq-container{
+  max-width:800px;
+  margin:0 auto;
+  text-align:left;
+}
+.faq-item{
+  background:#f8f9fa;
+  margin-bottom:10px;
+  border-radius:10px;
+  overflow:hidden;
+}
+.faq-item h3{
+  background:#0b3d91;
+  color:white;
+  padding:20px;
+  margin:0;
+  cursor:pointer;
+  transition:.3s;
+}
+.faq-item h3:hover{
+  background:#1e5ed8;
+}
+.faq-answer{
+  padding:0 20px;
+  max-height:0;
+  overflow:hidden;
+  transition:.3s;
+}
+.faq-answer p{
+  margin:20px 0;
+  color:#666;
+  line-height:1.6;
+}
+.faq-item.active .faq-answer{
+  max-height:200px;
+  padding:20px;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px 10px;
+  }
+  
+  nav {
+    margin-top: 15px;
+  }
+  
+  nav a {
+    margin: 0 6px;
+    font-size: 14px;
+  }
+  
+  .hero {
+    padding: 60px 20px;
+    margin-bottom: 40px;
+  }
+  
+  .hero h2 {
+    font-size: 32px;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+    margin: 0 0 40px 0;
+    gap: 15px;
+  }
+  
+  .about-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 30px;
+  }
+  
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .contact-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .contact-info {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 30px;
+  }
+  
+  .stats {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+  
+  .admin-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .admin-controls input {
+    margin-bottom: 10px;
+  }
+  
+  .newsletter {
+    flex-direction: column;
+  }
+  
+  .newsletter input {
+    margin-bottom: 10px;
+  }
+}
+
+/* BACK TO TOP BUTTON */
+#backToTop {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+#backToTop:hover {
+  background: #e68900;
+  transform: scale(1.1);
+}
+
+@media (max-width: 480px) {
+  .contact-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .btn {
+    width: 100%;
+    margin: 5px 0;
+  }
+  
+  .card {
+    margin: 15px auto;
+    padding: 20px;
+    max-width: 100%;
+  }
+  
+  .hero h2 {
+    font-size: 28px;
+  }
+  
+  .services-section h2,
+  .about-section h2,
+  .testimonials-section h2,
+  .faq-section h2,
+  .contact-section h2 {
+    font-size: 28px;
+  }
+}
+
+/* ALIGNMENT & LAYOUT IMPROVEMENTS */
+header {
+  padding: 16px 24px;
+}
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+nav a {
+  margin: 8px 10px;
+}
+.container {
+  width: min(96%, 1200px);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+section {
+  width: auto;
+  max-width: 1200px;
+  margin: 0 auto 40px auto;
+  padding: 40px 0;
+}
+.about-section,
+.services-section,
+.testimonials-section,
+.contact-section,
+.faq-section {
+  background: #fff;
+  border-radius: 30px;
+  padding: 60px 28px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+.card {
+  background: rgba(255,255,255,.92);
+  max-width: 760px;
+  width: 100%;
+  padding: 28px;
+  margin: 22px auto;
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.08);
+}
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 100px 20px;
+}
+.hero p {
+  max-width: 680px;
+  margin: 0 auto 24px auto;
+  line-height: 1.8;
+}
+.features,
+.services-grid,
+.about-content,
+.testimonials-grid,
+.contact-content,
+.contact-info,
+.footer-content {
+  justify-items: center;
+  align-items: start;
+}
+.about-content {
+  gap: 40px;
+}
+.about-text {
+  max-width: 700px;
+}
+.contact-content {
+  gap: 40px;
+}
+.contact-info {
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+}
+.contact-info .contact-item {
+  min-width: 0;
+}
+.about-image img,
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+}
+.contact-form input,
+.contact-form textarea,
+.contact-form select,
+.newsletter input {
+  width: 100%;
+}
+.admin-controls {
+  justify-content: center;
+}
+.whatsapp,
+#backToTop {
+  right: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<img src="SKTraderz_logo.svg" alt="SKTraderz" style="height: 50px;">
+<nav>
+<a href="#home">Home</a>
+<a href="#services">Services</a>
+<a href="#book">Book</a>
+<a href="#track">Track</a>
+<a href="#pricing">Pricing</a>
+<a href="#about">About</a>
+<a href="#contact">Contact</a>
+<a href="#admin" onclick="accessAdmin()">Admin</a>
+</nav>
+</header>
+
+<section class="hero" id="home">
+<h2>Lightning Fast Delivery ⚡</h2>
+<p>Trusted logistics partner in Delhi</p>
+<button class="btn" onclick="scrollTo('book')">Book Now</button>
+</section>
+
+<div class="container">
+
+<div class="features">
+<div class="feature">🚀 Same Day Delivery</div>
+<div class="feature">📦 Secure Handling</div>
+<div class="feature">📍 Wide Coverage</div>
+<div class="feature">💰 Best Pricing</div>
+</div>
+
+<section id="about" class="about-section">
+<div class="about-content">
+<div class="about-text">
+<h2>About SKTraderz</h2>
+<p>SKTraderz Logistics is Delhi's premier logistics and delivery service provider, committed to delivering excellence in transportation and supply chain management since 2020.</p>
+<p>With our extensive network and experienced team, we ensure your packages reach their destination safely, on time, and cost-effectively.</p>
+<div class="stats">
+<div class="stat">
+<h3>50K+</h3>
+<p>Deliveries Completed</p>
+</div>
+<div class="stat">
+<h3>98%</h3>
+<p>On-Time Delivery</p>
+</div>
+<div class="stat">
+<h3>24/7</h3>
+<p>Customer Support</p>
+</div>
+</div>
+</div>
+<div class="about-image">
+<img src="SKTraderz_logo.svg" alt="SKTraderz Logistics" style="max-width:320px; width:auto; border-radius:10px;">
+</div>
+</div>
+</section>
+
+<section id="services" class="services-section">
+<h2>Our Services</h2>
+<div class="services-grid">
+<div class="service-card">
+<h3>🚚 Express Delivery</h3>
+<p>Same-day delivery within Delhi NCR. Perfect for urgent shipments.</p>
+<ul>
+<li>Door-to-door service</li>
+<li>Real-time tracking</li>
+<li>Insurance coverage</li>
+</ul>
+</div>
+<div class="service-card">
+<h3>📦 Freight Forwarding</h3>
+<p>Heavy cargo and bulk shipments across India with specialized handling.</p>
+<ul>
+<li>Heavy machinery transport</li>
+<li>Bulk goods delivery</li>
+<li>Customs clearance</li>
+</ul>
+</div>
+<div class="service-card">
+<h3>🏪 E-commerce Solutions</h3>
+<p>Complete logistics solutions for online businesses and retailers.</p>
+<ul>
+<li>Warehouse management</li>
+<li>Last-mile delivery</li>
+<li>Return processing</li>
+</ul>
+</div>
+<div class="service-card">
+<h3>🌍 International Shipping</h3>
+<p>Global shipping services with customs expertise and documentation.</p>
+<ul>
+<li>Import/Export services</li>
+<li>Customs documentation</li>
+<li>International tracking</li>
+</ul>
+</div>
+</div>
+</section>
+
+<div class="card">
+<h3>🔐 Login</h3>
+<input id="userName" placeholder="Enter your name">
+<input id="userPickup" placeholder="Your default pickup address">
+<button class="btn" onclick="loginUser()">Login</button>
+<button class="btn secondary" onclick="logoutUser()" style="display:none;" id="logoutBtn">Logout</button>
+<p id="loginMsg"></p>
+</div>
+
+<div class="card" id="dashboard" style="display:none;">
+<h3>📊 My Orders</h3>
+<div id="myOrders"></div>
+</div>
+
+<div class="card" id="book">
+<h3>📦 Book Delivery</h3>
+<input id="sender" placeholder="Sender Name">
+<input id="pickup" placeholder="Pickup Address">
+<input id="receiver" placeholder="Receiver Name">
+<input id="delivery" placeholder="Delivery Address">
+<button class="btn" onclick="bookOrder()">Confirm Booking</button>
+<p id="msg"></p>
+</div>
+
+<div class="card" id="pricing">
+<h3>💰 Estimate Price</h3>
+<input id="km" type="number" placeholder="Distance (km)">
+<input id="wt" type="number" placeholder="Weight (kg)">
+<button class="btn" onclick="calcPrice()">Calculate</button>
+<p id="price"></p>
+</div>
+
+<section class="testimonials-section">
+<h2>What Our Customers Say</h2>
+<div class="testimonials-grid">
+<div class="testimonial">
+<div class="testimonial-content">
+<p>"SKTraderz delivered my urgent medical supplies within 2 hours. Their service is exceptional and reliable."</p>
+</div>
+<div class="testimonial-author">
+<strong>Dr. Priya Sharma</strong><br>
+Medical Professional
+</div>
+</div>
+<div class="testimonial">
+<div class="testimonial-content">
+<p>"I've been using SKTraderz for my e-commerce business for over a year. Their tracking system is fantastic."</p>
+</div>
+<div class="testimonial-author">
+<strong>Rajesh Kumar</strong><br>
+Online Store Owner
+</div>
+</div>
+<div class="testimonial">
+<div class="testimonial-content">
+<p>"Professional service with competitive pricing. My international shipments always arrive on time."</p>
+</div>
+<div class="testimonial-author">
+<strong>Meera Patel</strong><br>
+Import-Export Business
+</div>
+</div>
+</div>
+</section>
+
+<section class="faq-section">
+<h2>Frequently Asked Questions</h2>
+<div class="faq-container">
+<div class="faq-item">
+<h3 onclick="toggleFAQ(this)">How long does delivery take?</h3>
+<div class="faq-answer">
+<p>Same-day delivery within Delhi NCR for orders placed before 2 PM. Standard delivery takes 2-3 business days across India. International shipping varies by destination.</p>
+</div>
+</div>
+<div class="faq-item">
+<h3 onclick="toggleFAQ(this)">Do you provide insurance for shipments?</h3>
+<div class="faq-answer">
+<p>Yes, we offer comprehensive insurance coverage for all shipments. Additional insurance can be purchased for high-value items.</p>
+</div>
+</div>
+<div class="faq-item">
+<h3 onclick="toggleFAQ(this)">What items cannot be shipped?</h3>
+<div class="faq-answer">
+<p>We cannot ship hazardous materials, illegal substances, perishable items, or items prohibited by law. Please contact us for specific restrictions.</p>
+</div>
+</div>
+<div class="faq-item">
+<h3 onclick="toggleFAQ(this)">How do I track my package?</h3>
+<div class="faq-answer">
+<p>Use the tracking ID provided at booking to track your package in real-time. You'll receive SMS and email updates at each stage.</p>
+</div>
+</div>
+<div class="faq-item">
+<h3 onclick="toggleFAQ(this)">What if my package is damaged?</h3>
+<div class="faq-answer">
+<p>Report any damage immediately upon delivery. We have a claims process and insurance coverage to handle such situations.</p>
+</div>
+</div>
+<div class="faq-item">
+<h3 onclick="toggleFAQ(this)">Can I change delivery address after booking?</h3>
+<div class="faq-answer">
+<p>Address changes are possible within 2 hours of booking. Contact our customer service team immediately for assistance.</p>
+</div>
+</div>
+</div>
+</section>
+
+<div class="card" id="track">
+<h3>🔍 Track Package</h3>
+<input id="trackId" placeholder="Tracking ID">
+<button class="btn" onclick="trackOrder()">Track</button>
+<div id="trackingUI" style="display:none">
+<p id="statusText"></p>
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+</div>
+
+<section id="contact" class="contact-section">
+<h2>Contact Us</h2>
+<div class="contact-content">
+<div class="contact-info">
+<div class="contact-item">
+<h3>📍 Address</h3>
+<p>123 Logistics Street<br>Delhi, India 110001</p>
+</div>
+<div class="contact-item">
+<h3>📞 Phone</h3>
+<p>+91 98765 43210<br>+91 98765 43211</p>
+</div>
+<div class="contact-item">
+<h3>✉️ Email</h3>
+<p>info@sktraderz.com<br>support@sktraderz.com</p>
+</div>
+<div class="contact-item">
+<h3>🕒 Business Hours</h3>
+<p>Mon-Sat: 9:00 AM - 9:00 PM<br>Sunday: 10:00 AM - 6:00 PM</p>
+</div>
+</div>
+<div class="contact-form">
+<h3>Send us a Message</h3>
+<input id="contactName" placeholder="Your Name">
+<input id="contactEmail" placeholder="Your Email">
+<input id="contactSubject" placeholder="Subject">
+<textarea id="contactMessage" placeholder="Your Message" rows="5"></textarea>
+<button class="btn" onclick="sendMessage()">Send Message</button>
+<p id="contactMsg"></p>
+</div>
+</div>
+</section>
+
+<div id="adminSection" style="display:none;">
+<h3>🛠 Admin Panel</h3>
+<div class="admin-controls">
+  <button class="btn" onclick="loadOrders()">📋 Load All Orders</button>
+  <input id="orderSearch" placeholder="Search orders by ID, sender, or receiver" style="flex:1; margin:0 10px; padding:10px; border-radius:5px; border:1px solid #ddd;">
+  <button class="btn secondary" onclick="searchOrders()">🔍 Search</button>
+  <button class="btn secondary" onclick="exportOrders()">📊 Export CSV</button>
+</div>
+<div id="orders"></div>
+
+<h4>📦 Add Courier Tracking</h4>
+<input id="courierTrackingId" placeholder="Enter Tracking ID">
+<select id="courierCarrier">
+  <option value="DHL">DHL</option>
+  <option value="FedEx">FedEx</option>
+  <option value="UPS">UPS</option>
+  <option value="USPS">USPS</option>
+  <option value="BlueDart">BlueDart</option>
+</select>
+<select id="courierStatus">
+  <option value="Package Received">Package Received</option>
+  <option value="In Transit">In Transit</option>
+  <option value="Out for Delivery">Out for Delivery</option>
+  <option value="Delivered">Delivered</option>
+  <option value="Exception">Exception</option>
+</select>
+<input id="courierSender" placeholder="Sender Name (optional)">
+<input id="courierReceiver" placeholder="Receiver Name (optional)">
+<button class="btn" onclick="addTrackingData()">💾 Add Tracking</button>
+<p id="trackingMsg"></p>
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+<div class="footer-content">
+<div class="footer-section">
+<h3>SKTraderz Logistics</h3>
+<p>Your trusted partner for fast and reliable delivery services across Delhi and India.</p>
+<div class="social-links">
+<a href="#" class="social-link">📘 Facebook</a>
+<a href="#" class="social-link">🐦 Twitter</a>
+<a href="#" class="social-link">📷 Instagram</a>
+<a href="#" class="social-link">💼 LinkedIn</a>
+</div>
+</div>
+<div class="footer-section">
+<h3>Quick Links</h3>
+<ul>
+<li><a href="#home">Home</a></li>
+<li><a href="#services">Services</a></li>
+<li><a href="#book">Book Delivery</a></li>
+<li><a href="#track">Track Package</a></li>
+<li><a href="#pricing">Pricing</a></li>
+<li><a href="#about">About Us</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+</div>
+<div class="footer-section">
+<h3>Services</h3>
+<ul>
+<li>Express Delivery</li>
+<li>Freight Forwarding</li>
+<li>E-commerce Solutions</li>
+<li>International Shipping</li>
+<li>Warehousing</li>
+<li>Customs Clearance</li>
+</ul>
+</div>
+<div class="footer-section">
+<h3>Newsletter</h3>
+<p>Subscribe to get updates on our services and special offers.</p>
+<div class="newsletter">
+<input id="newsletterEmail" placeholder="Enter your email" style="padding:8px; border-radius:5px; border:1px solid #ddd;">
+<button onclick="subscribeNewsletter()" style="padding:8px 15px; background:#ff9800; color:white; border:none; border-radius:5px; cursor:pointer;">Subscribe</button>
+</div>
+<p id="newsletterMsg" style="margin-top:10px;"></p>
+</div>
+</div>
+<div class="footer-bottom">
+<p>&copy; 2026 SKTraderz Logistics. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<a class="whatsapp">💬</a>
+<button id="backToTop" onclick="scrollTo('home')" style="position:fixed; bottom:80px; right:20px; background:#ff9800; color:white; border:none; border-radius:50%; width:50px; height:50px; font-size:20px; cursor:pointer; display:none; box-shadow:0 4px 8px rgba(0,0,0,0.3);">↑</button>
+
+<script>
+try {
+  const firebaseConfig={
+    apiKey:"YOUR_API_KEY",
+    authDomain:"YOUR_PROJECT.firebaseapp.com",
+    databaseURL:"https://YOUR_PROJECT.firebaseio.com",
+    projectId:"YOUR_PROJECT"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db=firebase.database();
+} catch (e) {}
+
+let currentUser="";
+
+// ✅ AUTO LOGIN (MAIN FIX)
+window.addEventListener('load', function() {
+  const savedUser = localStorage.getItem('currentUser');
+  const savedPickup = localStorage.getItem('userPickup');
+
+  if (savedUser) {
+    currentUser = savedUser;
+
+    document.getElementById("userName").value = savedUser;
+    document.getElementById("userPickup").value = savedPickup || '';
+
+    document.getElementById("sender").value = savedUser;
+    document.getElementById("pickup").value = savedPickup || '';
+
+    document.getElementById("loginMsg").innerHTML = "✅ Welcome back, " + savedUser;
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("logoutBtn").style.display = "inline-block";
+
+    loadMyOrders();
+  }
+});
+
+// ✅ LOGIN
+function loginUser(){
+  let name=document.getElementById("userName").value.trim();
+  let pickup=document.getElementById("userPickup").value.trim();
+
+  if(!name){
+    toast("Enter name");
+    return;
+  }
+
+  currentUser=name;
+
+  localStorage.setItem('currentUser', name);
+  localStorage.setItem('userPickup', pickup);
+
+  // Auto fill booking form
+  document.getElementById("sender").value = name;
+  document.getElementById("pickup").value = pickup;
+
+  document.getElementById("loginMsg").innerHTML="✅ Logged in as "+name;
+  document.getElementById("dashboard").style.display="block";
+  document.getElementById("logoutBtn").style.display="inline-block";
+
+  loadMyOrders();
+}
+
+// ✅ LOGOUT
+function logoutUser(){
+  if(confirm("Logout?")){
+    currentUser="";
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userPickup');
+
+    document.getElementById("userName").value="";
+    document.getElementById("userPickup").value="";
+    document.getElementById("sender").value="";
+    document.getElementById("pickup").value="";
+
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("logoutBtn").style.display="none";
+    document.getElementById("myOrders").innerHTML="";
+
+    toast("Logged out");
+  }
+}
+
+// ✅ LOAD USER ORDERS
+function loadMyOrders(){
+  let html='';
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+
+    if (key.startsWith('orders/')) {
+      const data = JSON.parse(localStorage.getItem(key));
+
+      if (data.sender === currentUser) {
+        html += `<div class="order">
+          <b>${data.id}</b><br>
+          Status: ${data.status}
+        </div><hr>`;
+      }
+    }
+  }
+
+  document.getElementById("myOrders").innerHTML = html || "No orders found";
+}
+
+// ✅ BOOK ORDER
+function generateId(){
+  return 'SK'+Math.floor(Math.random()*100000);
+}
+
+function bookOrder(){
+  let id=generateId();
+
+  let senderName=document.getElementById("sender").value || currentUser;
+  let pickupAddr=document.getElementById("pickup").value || localStorage.getItem('userPickup');
+  let receiverName=document.getElementById("receiver").value;
+  let deliveryAddr=document.getElementById("delivery").value;
+
+  if (!senderName || !pickupAddr || !receiverName || !deliveryAddr) {
+    document.getElementById("msg").innerHTML="❌ Fill all fields";
+    return;
+  }
+
+  const orderData={
+    id,
+    sender: senderName,
+    pickup: pickupAddr,
+    receiver: receiverName,
+    delivery: deliveryAddr,
+    status:'Picked Up'
+  };
+
+  localStorage.setItem('orders/'+id, JSON.stringify(orderData));
+
+  document.getElementById("msg").innerHTML=
+    `✅ Booking Done! ID: <b>${id}</b>`;
+
+  toast("Order booked");
+
+  loadMyOrders();
+}
+
+// ✅ TRACK ORDER
+function trackOrder(){
+  let id=document.getElementById("trackId").value.trim();
+
+  let data=localStorage.getItem('orders/'+id);
+
+  if(!data){
+    toast("Not found");
+    return;
+  }
+
+  data=JSON.parse(data);
+
+  document.getElementById('trackingUI').style.display='block';
+  document.getElementById('statusText').innerHTML='Status: '+data.status;
+
+  let p = data.status==='Picked Up'?33:
+          data.status==='In Transit'?66:100;
+
+  document.getElementById('progressBar').style.width=p+'%';
+}
+
+// ✅ FIXED CONTACT FORM (IMPORTANT FIX)
+function sendMessage(){
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const subject = document.getElementById('contactSubject').value.trim();
+  const message = document.getElementById('contactMessage').value.trim();
+  const msgDisplay = document.getElementById('contactMsg');
+
+  if (!name || !email || !subject || !message) {
+    msgDisplay.innerHTML = '❌ Fill all fields';
+    msgDisplay.style.color = 'red';
+    return;
+  }
+
+  msgDisplay.innerHTML = '✅ Message sent!';
+  msgDisplay.style.color = 'green';
+
+  document.getElementById('contactName').value='';
+  document.getElementById('contactEmail').value='';
+  document.getElementById('contactSubject').value='';
+  document.getElementById('contactMessage').value='';
+
+  toast('Message sent');
+}
+
+// ✅ PRICE
+function calcPrice(){
+  let km=+document.getElementById("km").value||0;
+  let wt=+document.getElementById("wt").value||0;
+
+  document.getElementById("price").innerText='₹'+(30+(km*5)+(wt*10));
+}
+
+// ✅ TOAST
+function toast(msg){
+  let t=document.getElementById('toast');
+  t.innerText=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+</script>
+
+</body>
+</html>
